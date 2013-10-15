@@ -5,7 +5,7 @@ Ext.onReady(function() {
     GeoExt.Lang.set("es");
 
     app = new gxp.Viewer({
-        proxy: "/mapa/proxy/?url=",
+        proxy: "/proxy/?src=",
         portalConfig: {
             layout: "border",
             items: [{

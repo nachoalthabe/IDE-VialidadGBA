@@ -59,11 +59,11 @@ var sources = {
         title: "Secretaría de Energía",
         ptype: "gxp_wmscsource"
     },
-    segemar: {
-        url: "http://www.onegeology-arg.com.ar/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities",
-        title: "SEGEMAR",
-        ptype: "gxp_wmscsource"
-    },
+    // segemar: {
+    //     url: "http://www.onegeology-arg.com.ar/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities",
+    //     title: "SEGEMAR",
+    //     ptype: "gxp_wmscsource"
+    // },
     arba: {
         url: "http://cartoservices.arba.gov.ar/geoserver/wms?service=WMS&request=getcapabilities",
         title: "Buenos Aires - ARBA",

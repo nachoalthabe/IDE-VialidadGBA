@@ -1,10 +1,11 @@
-var app;
+var app, progresiva;
 Ext.onReady(function() {
     GeoExt.Lang.set("es");
+    progresiva = new Progresiva(this);
     app = new gxp.Viewer({
         //proxy: "/geoserver/rest/proxy?url=",
 	//authenticate: "null",
-	proxy: "/mapa/proxy/?url=",
+	proxy: "/proxy/?src=",
         portalConfig: {
             layout: "border",
             //region: "center",
@@ -82,16 +83,16 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
         },{
             ptype: "gxp_zoomtoextent",
             actionTarget: "map.tbar",
-	    extent: new OpenLayers.Bounds(-75,-56,-52,-20)
+            extent: new OpenLayers.Bounds(-75,-56,-52,-20)
         },{
             ptype: "gxp_zoom",
-	    showZoomBoxAction: true,
+            showZoomBoxAction: true,
             actionTarget: "map.tbar",
-	    toggleGroup: "navegacion"
+            toggleGroup: "navegacion"
         },{
             ptype: "gxp_navigationhistory",
             actionTarget: "map.tbar",
-	    toggleGroup: "navegacion"
+            toggleGroup: "navegacion"
         },{
             ptype: "gxp_wmsgetfeatureinfo",
             outputConfig: {
@@ -99,7 +100,7 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
                 height: "auto"
             },
             actionTarget: "map.tbar",
-	    toggleGroup: "navegacion"
+            toggleGroup: "navegacion"
         },{
             ptype: "gxp_measure",
             outputConfig: {
@@ -107,7 +108,7 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
                 height: "auto"
             },
             actionTarget: "map.tbar",
-	    toggleGroup: "navegacion"
+            toggleGroup: "navegacion"
         },{
             ptype: "gxp_legend",
             outputTarget: "leyenda"
@@ -120,19 +121,16 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
         },{ 
             xtype: "gxp_scaleoverlay",
             actionTarget: "map.tbar"
-          },
-	{
+        },{
             // not a useful tool - just a demo for additional items
             xtype: "tbbutton",
-	    actionTarget: "map.tbar",
+            actionTarget: "map.tbar",
             actions: [{
-                  text: 'Cambiar a EPSG:4326',
-                  handler: function() {
-                  window.location = 'index.html' ;
-                      }
-                     }
-            ]
-
+                text: 'Progresiva',
+                handler: function() {
+                    progresiva.mostrar();
+                }
+            }]
         }],
         
         // layer sources
@@ -252,16 +250,16 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
                 name: "SIGN",
                 title: "Capa Base SIG 250 IGN",
                 selected: true,
-		group: "background"
+                group: "background"
             },{
-                    source: "ol",
-                    group: "background",
-                    fixed: true,
-                    type: "OpenLayers.Layer",
-                    args: [
-                        "Sin capa base", {visibility: false}
-                    ]
-                }],
+                source: "ol",
+                group: "background",
+                fixed: true,
+                type: "OpenLayers.Layer",
+                args: [
+                    "Sin capa base", {visibility: false}
+                ]
+            }],
             items: [{
                 xtype: "gx_zoomslider",
                 vertical: true,
