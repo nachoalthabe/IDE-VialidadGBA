@@ -1,7 +1,6 @@
 var app, progresiva;
 Ext.onReady(function() {
     GeoExt.Lang.set("es");
-    progresiva = new Progresiva(this);
     app = new gxp.Viewer({
         //proxy: "/geoserver/rest/proxy?url=",
 	//authenticate: "null",
@@ -267,4 +266,5 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
             }]
         }
     });
+    progresiva = new Progresiva(this);
 });
