@@ -49,36 +49,36 @@ var sources = {
         title: "INTA",
         ptype: "gxp_wmscsource"
     },
-    indec: {
-        url: "http://200.51.91.231/cgi-bin/mapserv?program=/cgibin/mapserv&map=/prosiga/INDEC_WMS_Poblacion.map&SERVICE=WMS&Version=1.1.1&REQUEST=GetCapabilities",
-        title: "INDEC",
-        ptype: "gxp_wmscsource"
-    },
-    energia: {
-        url: "http://sig.se.gov.ar/gis/wms6/?service=WMS&version=1.1.1&request=GetCapabilities",
-        title: "Secretaría de Energía",
-        ptype: "gxp_wmscsource"
-    },
+    // indec: {
+    //     url: "http://200.51.91.231/cgi-bin/mapserv?program=/cgibin/mapserv&map=/prosiga/INDEC_WMS_Poblacion.map&SERVICE=WMS&Version=1.1.1&REQUEST=GetCapabilities",
+    //     title: "INDEC",
+    //     ptype: "gxp_wmscsource"
+    // },
+    // energia: {
+    //     url: "http://sig.se.gov.ar/gis/wms6/?service=WMS&version=1.1.1&request=GetCapabilities",
+    //     title: "Secretaría de Energía",
+    //     ptype: "gxp_wmscsource"
+    // },
     // segemar: {
     //     url: "http://www.onegeology-arg.com.ar/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities",
     //     title: "SEGEMAR",
     //     ptype: "gxp_wmscsource"
     // },
-    arba: {
-        url: "http://cartoservices.arba.gov.ar/geoserver/wms?service=WMS&request=getcapabilities",
-        title: "Buenos Aires - ARBA",
-        ptype: "gxp_wmscsource"
-    },
+    // arba: {
+    //     url: "http://cartoservices.arba.gov.ar/geoserver/wms?service=WMS&request=getcapabilities",
+    //     title: "Buenos Aires - ARBA",
+    //     ptype: "gxp_wmscsource"
+    // },
     urbasig: {
         url: "http://www.mosp.gba.gov.ar/webmapping/cgi-bin/urbasig",
         title: "Buenos Aires - URBASIG",
         ptype: "gxp_wmscsource"
     },
-    mapaescolar: {
-        url: "http://190.210.101.129/cgi-bin/mapaescolar",
-        title: "Buenos Aires - Mapa Escolar",
-        ptype: "gxp_wmscsource"
-    },
+    // mapaescolar: {
+    //     url: "http://190.210.101.129/cgi-bin/mapaescolar",
+    //     title: "Buenos Aires - Mapa Escolar",
+    //     ptype: "gxp_wmscsource"
+    // },
     hidraulica: {
         url: "http://www.mosp.gba.gov.ar/wms_hidraulica/cgi-bin/mapserv.exe?map=/ms4w/apps/m/wms.map",
         title: "Buenos Aires - Dccion. Hidraulica",
