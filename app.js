@@ -171,6 +171,12 @@ Ext.onReady(function() {
             stateId: "map",
             prettyStateKeys: true,
             layers: [{
+                source: "local",
+                name: "red_vial_22185",
+                title: "Local",
+                selected: true,
+                group: "Prueba"
+            },{
                 source: "ign",
                 name: "argentina500k:argentina500k_satelital",
                 title: "Satelital SAC-C. IGN - CONAE",

@@ -1,6 +1,8 @@
 var server = "http://25.9.84.47:8080/";//http://hyperdvba:8080/";
 var capa = "red_vial_22185";//"primaria";
 var workspace = "Vialidad";//"dvba";
+proj4.defs["EPSG:22185"] = "+proj=tmerc +lat_0=-90 +lon_0=-60 +k=1 +x_0=5500000 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+//var Proj4js = proj4;
 var Progresiva = new Class({ 
 	Implements: Events,
 	win: false,
@@ -12,7 +14,9 @@ var Progresiva = new Class({
 		this.clickEnMapa();
 		this.dom.getElement('button').addEvent('click',this.consultar.bind(this));
 		window.callbackProgresiva = this.procesarRespuesta.bind(this);
-		this.capa = new OpenLayers.Layer.Vector("Consulta Progresiva", {});
+		this.capa = new OpenLayers.Layer.Vector("Consulta Progresiva", {
+			group: "vialidad"
+		});
 	},
 	mostrar: function(){
 		var self = this;
@@ -26,10 +30,11 @@ var Progresiva = new Class({
 				autoScroll	: true,
 				onHide: function(){
 					self.clickControl.deactivate();
-					app.mapPanel.map.removeLayer(this.capa);
+					app.mapPanel.map.removeLayer(self.capa);
 				},
 				onShow: function(){
 					self.clickControl.activate();
+					app.mapPanel.map.addLayer(self.capa);
 				}
 			});
 		}
@@ -37,6 +42,7 @@ var Progresiva = new Class({
 		this.win.show(this.ext);
 	},
 	clickEnMapa: function(){
+		var self = this;
 		ClickControl = OpenLayers.Class(OpenLayers.Control, {                
             defaultHandlerOptions: {
                 'single': true,
@@ -61,11 +67,21 @@ var Progresiva = new Class({
             }, 
 
             trigger: function(e) {
+            	var resultadoDom = self.dom.getElement('#resultadoP')
+				resultadoDom.empty();
                 var lonlat = app.mapPanel.map.getLonLatFromPixel(e.xy);
                 var point = new OpenLayers.Geometry.Point(lonlat.lon,lonlat.lat);
+                if(self.bufferVec){
+					self.capa.removeFeatures([self.bufferVec]);
+					self.bufferVec = false;
+                }
+                var bufferValue = parseInt(self.dom.getElement('#bufferP').value);
+                var buffer = new OpenLayers.Geometry.Polygon.createRegularPolygon(point,bufferValue,20);
+				
+				self.bufferVec = new OpenLayers.Feature.Vector(buffer);
+				self.capa.addFeatures([self.bufferVec]);
                 
-                var buffer = new OpenLayers.Geometry.Polygon.createRegularPolygon(point,10,20);
-                var bounds = buffer.getBounds();
+                var bounds = buffer.getBounds().toArray();
                 
 				var myJSONP = new Request.JSONP({
 					url: server+'geoserver/'+workspace+'/wfs',
@@ -78,7 +94,7 @@ var Progresiva = new Class({
 						srsName: app.mapPanel.map.getProjection(),
 						outputFormat: 'text/javascript',
 						format_options: 'callback:callbackProgresiva',
-						cql_filter: 'INTERSECTS(the_geom,'+buffer.transform(app.mapPanel.map.getProjection(),'EPSG:22185').toString()+')'
+						filter: "<Filter><BBOX><PropertyName>the_geom</PropertyName><Box srsName='EPSG:900913'><coordinates>"+bounds[0]+","+bounds[1]+" "+bounds[2]+","+bounds[3]+"</coordinates></Box></BBOX></Filter>"
 					},
 				}).send();
             }
@@ -89,6 +105,8 @@ var Progresiva = new Class({
 		//this.clickControl.deactivate();
 	},
 	consultar: function(){
+		var resultadoDom = this.dom.getElement('#resultadoP')
+		resultadoDom.empty();
 		this.kilometro = this.dom.getElement('#kilomentroP').value;
 		this.ruta = this.dom.getElement('#rutaP').value.trim();
 		var myJSONP = new Request.JSONP({
@@ -165,6 +183,10 @@ var Progresiva = new Class({
 						listo = true;
 						var porcentajeTramo = porcentajeEnSuma/point.distanceTo(vertices[i+1]);
 						var distanciaProximo = point.distanceTo(vertices[i+1],{details:true});
+						if(self.puntoConsulta){
+							self.capa.removeFeatures([self.puntoConsulta]);
+							self.puntoConsulta = false;
+		                }
 						self.puntoConsulta = point.clone();
 						self.puntoConsulta.x = distanciaProximo.x0+(distanciaProximo.x1-distanciaProximo.x0)*porcentajeTramo;
 						self.puntoConsulta.y = distanciaProximo.y0+(distanciaProximo.y1-distanciaProximo.y0)*porcentajeTramo;
@@ -175,6 +197,13 @@ var Progresiva = new Class({
 						porcentajeEnSuma -= point.distanceTo(vertices[i+1]);
 					}
 				})
+
+				if(self.vectorFeature){
+					self.capa.removeFeatures([self.vectorFeature]);
+					self.vectorFeature = false;
+                }
+				self.vectorFeature = new OpenLayers.Feature.Vector(geometria);
+				self.capa.addFeatures([self.vectorFeature]);
 
 				var boton = new Element('button',{
 					text: 'Ver en mapa'

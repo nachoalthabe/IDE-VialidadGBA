@@ -60,12 +60,21 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
         // configuration of all tool plugins for this application
         tools: [{
             ptype: "gxp_layertree",
+            id: 'layerTree',
             outputConfig: {
                 id: "tree",
                 border: true,
                 tbar: [] // we will add buttons to "tree.bbar" later
             },
-            outputTarget: "arbol"
+            outputTarget: "arbol",
+            groups: {
+                "vialidad": "Vialidad",
+                "default": "Overlays", // title can be overridden with overlayNodeText
+                "background": {
+                    title: "Base Maps", // can be overridden with baseNodeText
+                    exclusive: true
+                }
+            }
         },{
             ptype: "gxp_addlayers",
             actionTarget: "tree.tbar",
@@ -195,11 +204,11 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
   //                   title: "Secretaría de Energía",
   //                   ptype: "gxp_wmscsource"
   //               },
-		segemar: {
-                    url: "http://www.onegeology-arg.com.ar/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities",
-                    title: "SEGEMAR",
-                    ptype: "gxp_wmscsource"
-                },
+		// segemar: {
+  //                   url: "http://www.onegeology-arg.com.ar/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities",
+  //                   title: "SEGEMAR",
+  //                   ptype: "gxp_wmscsource"
+  //               },
 		arba: {
                     url: "http://cartoservices.arba.gov.ar/geoserver/wms?service=WMS&request=getcapabilities",
                     title: "Buenos Aires - ARBA",
@@ -225,11 +234,17 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
                 },
                           
 		idera_csw: {
-                ptype: "gxp_cataloguesource",
-		url: "http://www.idera.gob.ar/catalogo/srv/es/csw?request=GetCapabilities&service=CSW",
+            ptype: "gxp_cataloguesource",
+            url: "http://www.idera.gob.ar/catalogo/srv/es/csw?request=GetCapabilities&service=CSW",
                 //url: "http://ide.se.gov.ar/geonetwork/srv/en/csw",
-                title: "Catalogo IDERA"
-            }
+            title: "Catalogo IDERA"
+        },
+        local: {
+            url: "http://127.0.0.1:8080/geoserver/Vialidad/wfs",
+                //url: "http://ide.se.gov.ar/geonetwork/srv/en/csw",
+            ptype: "gxp_wmscsource",
+            title: "Local"  
+        }
         },
         
         // map and layers
@@ -245,6 +260,12 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
 
 	    //scales: [2000,5000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,5000000],
             layers: [{
+                source: "local",
+                name: "red_vial_22185",
+                title: "Vialidad",
+                selected: true,
+                group: "vialidad"
+            },{
                 source: "ign",
                 name: "SIGN",
                 title: "Capa Base SIG 250 IGN",

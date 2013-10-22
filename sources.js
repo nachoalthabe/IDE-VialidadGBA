@@ -97,5 +97,10 @@ var sources = {
         url: "http://www.idera.gob.ar/catalogo/srv/es/csw?request=GetCapabilities&service=CSW",
         //url: "http://ide.se.gov.ar/geonetwork/srv/en/csw",
         title: "Catalogo IDERA"
+    },
+    local: {
+        ptype: "gxp_cataloguesource",
+        url: "http://127.0.0.1:8080/geoserver/Vialidad/wfs",
+        title: "Local"
     }
 }
