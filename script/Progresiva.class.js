@@ -82,7 +82,7 @@ var Progresiva = new Class({
 				self.capa.addFeatures([self.bufferVec]);
                 
                 var bounds = self.buffer.getBounds().toArray();
-                
+                self.win.disable();
 				var myJSONP = new Request.JSONP({
 					url: server+'geoserver/'+workspace+'/wfs',
 					data: {
@@ -109,6 +109,7 @@ var Progresiva = new Class({
 		resultadoDom.empty();
 		this.kilometro = this.dom.getElement('#kilomentroP').value;
 		this.ruta = this.dom.getElement('#rutaP').value.trim();
+		this.win.disable();
 		var myJSONP = new Request.JSONP({
 			url: server+'geoserver/'+workspace+'/wfs',
 			data: {
@@ -131,7 +132,7 @@ var Progresiva = new Class({
 		var resultadoDom = this.dom.getElement('#resultadoP')
 		resultadoDom.empty();
 		if(respuesta.features.length == 0){
-			resultadoDom.set('text','Sin resultados');
+			Ext.MessageBox.alert('Error', 'No se pudo encontrar la progresiva, los datos son erroneos.');
 		}else{
 			respuesta.features.each(function(item){
 				var feature = item;
@@ -206,7 +207,6 @@ var Progresiva = new Class({
 						self.puntoConsulta.y = distanciaProximo.y0+(distanciaProximo.y1-distanciaProximo.y0)*porcentajeTramo;
 						self.puntoFeature = new OpenLayers.Feature.Vector(self.puntoConsulta);
 						self.capa.addFeatures([self.puntoFeature]);
-						app.mapPanel.map.setCenter([self.puntoConsulta.x,self.puntoConsulta.y],15);
 					}else{
 						porcentajeEnSuma -= point.distanceTo(vertices[i+1]);
 					}
@@ -218,7 +218,8 @@ var Progresiva = new Class({
                 }
 				self.vectorFeature = new OpenLayers.Feature.Vector(geometria);
 				self.capa.addFeatures([self.vectorFeature]);
-
+				self.win.enable();
+				app.mapPanel.map.setCenter([self.puntoConsulta.x,self.puntoConsulta.y],15);
 				// var boton = new Element('button',{
 				// 	text: 'Ver en mapa'
 				// });
