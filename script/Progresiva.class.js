@@ -75,13 +75,13 @@ var Progresiva = new Class({
 					self.capa.removeFeatures([self.bufferVec]);
 					self.bufferVec = false;
                 }
-                var bufferValue = parseInt(self.dom.getElement('#bufferP').value);
-                var buffer = new OpenLayers.Geometry.Polygon.createRegularPolygon(point,bufferValue,20);
+                var bufferValue = 50;
+                self.buffer = new OpenLayers.Geometry.Polygon.createRegularPolygon(point,bufferValue,20);
 				
-				self.bufferVec = new OpenLayers.Feature.Vector(buffer);
+				self.bufferVec = new OpenLayers.Feature.Vector(self.buffer);
 				self.capa.addFeatures([self.bufferVec]);
                 
-                var bounds = buffer.getBounds().toArray();
+                var bounds = self.buffer.getBounds().toArray();
                 
 				var myJSONP = new Request.JSONP({
 					url: server+'geoserver/'+workspace+'/wfs',
@@ -135,21 +135,21 @@ var Progresiva = new Class({
 		}else{
 			respuesta.features.each(function(item){
 				var feature = item;
-				var mapa = [];
-				for(i in feature.properties){
-					if(typeof feature.properties[i] == 'function')
-						continue;
-					mapa.push([i,feature.properties[i]]);
-				}
-				var resultado = new HtmlTable({
-					properties: {
-						border: 1,
-						cellspacing: 0
-					},
-					headers: ['Propiedad', 'Valor'],
-					rows: mapa,
-					zebra: true
-				});
+				// var mapa = [];
+				// for(i in feature.properties){
+				// 	if(typeof feature.properties[i] == 'function')
+				// 		continue;
+				// 	mapa.push([i,feature.properties[i]]);
+				// }
+				// var resultado = new HtmlTable({
+				// 	properties: {
+				// 		border: 1,
+				// 		cellspacing: 0
+				// 	},
+				// 	headers: ['Propiedad', 'Valor'],
+				// 	rows: mapa,
+				// 	zebra: true
+				// });
 				var punto,
 					lineString = [];
 				for (i in feature.geometry.coordinates[0]){
@@ -171,9 +171,23 @@ var Progresiva = new Class({
 				vertices.each(function(point,i){
 					if(i==vertices.length-1) return;
 					//console.log(point.distanceTo(vertices[i+1]));
+					if(self.buffer){
+						var partecita = new OpenLayers.Geometry.LineString([vertices[i],vertices[i+1]]);
+						if(self.buffer.intersects(partecita)){
+							sumaBuffer = suma + point.distanceTo(self.buffer.getCentroid());
+						}
+					}
 					suma += point.distanceTo(vertices[i+1]);
 				})
+				if(self.buffer){
+					self.buffer = false;
+					var porcentaje = ((sumaBuffer / suma)>1)?1:(sumaBuffer / suma);
+					self.dom.getElement('#kilomentroP').value = Math.round((feature.properties.PK_INIC + (feature.properties.PK_FINAL - feature.properties.PK_INIC) * porcentaje)*1000)/1000;
+					self.dom.getElement('#rutaP').value = feature.properties.RUTA;
+				}
+				
 				var porcentajeEnSuma = suma * porcentaje;
+				
 				var listo = false;
 				vertices.each(function(point,i){
 					if(listo) return;
@@ -183,16 +197,16 @@ var Progresiva = new Class({
 						listo = true;
 						var porcentajeTramo = porcentajeEnSuma/point.distanceTo(vertices[i+1]);
 						var distanciaProximo = point.distanceTo(vertices[i+1],{details:true});
-						if(self.puntoConsulta){
-							self.capa.removeFeatures([self.puntoConsulta]);
-							self.puntoConsulta = false;
+						if(self.puntoFeature){
+							self.capa.removeFeatures([self.puntoFeature]);
+							self.puntoFeature = false;
 		                }
 						self.puntoConsulta = point.clone();
 						self.puntoConsulta.x = distanciaProximo.x0+(distanciaProximo.x1-distanciaProximo.x0)*porcentajeTramo;
 						self.puntoConsulta.y = distanciaProximo.y0+(distanciaProximo.y1-distanciaProximo.y0)*porcentajeTramo;
 						self.puntoFeature = new OpenLayers.Feature.Vector(self.puntoConsulta);
 						self.capa.addFeatures([self.puntoFeature]);
-						console.log(porcentajeTramo);
+						app.mapPanel.map.setCenter([self.puntoConsulta.x,self.puntoConsulta.y],15);
 					}else{
 						porcentajeEnSuma -= point.distanceTo(vertices[i+1]);
 					}
@@ -205,15 +219,15 @@ var Progresiva = new Class({
 				self.vectorFeature = new OpenLayers.Feature.Vector(geometria);
 				self.capa.addFeatures([self.vectorFeature]);
 
-				var boton = new Element('button',{
-					text: 'Ver en mapa'
-				});
-				boton.addEvent('click',function(){
-					app.mapPanel.map.zoomToExtent(geometria.getBounds());
-				})
+				// var boton = new Element('button',{
+				// 	text: 'Ver en mapa'
+				// });
+				// boton.addEvent('click',function(){
+				// 	app.mapPanel.map.zoomToExtent(geometria.getBounds());
+				// })
 				
-				boton.inject(resultadoDom);
-				resultado.inject(resultadoDom);
+				// boton.inject(resultadoDom);
+				// resultado.inject(resultadoDom);
 			})
 		}
 	}

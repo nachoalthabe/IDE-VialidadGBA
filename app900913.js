@@ -240,7 +240,7 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
             title: "Catalogo IDERA"
         },
         local: {
-            url: "http://127.0.0.1:8080/geoserver/Vialidad/wfs",
+            url: "http://25.9.84.47:8080/geoserver/Vialidad/wfs",
                 //url: "http://ide.se.gov.ar/geonetwork/srv/en/csw",
             ptype: "gxp_wmscsource",
             title: "Local"  
