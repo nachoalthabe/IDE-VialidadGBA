@@ -22,9 +22,9 @@ var Progresiva = new Class({
 		var self = this;
 		if(!this.win){
 			this.win = new Ext.Window({
-				title		: 'Calcular Progresiva',
-				width		: 400,
-				height		: 300,
+				title		: 'Busqueda y Calculo de Progresiva',
+				width		: 300,
+				height		: 100,
 				closeAction	: 'hide',
 				contentEl	: this.dom,
 				autoScroll	: true,
