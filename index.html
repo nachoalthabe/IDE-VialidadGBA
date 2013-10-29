@@ -8,6 +8,7 @@
         <link rel="stylesheet" type="text/css" href="./theme/openlayers/default/google.css" />
         <link rel="stylesheet" type="text/css" href="./theme/geoext/css/geoext-all.css" />
         <link rel="stylesheet" type="text/css" href="./theme/gxp/all.css"/>
+        <link rel="stylesheet" type="text/css" href="./theme/vialidad.css"/>
         <script src="http://extjs.cachefly.net/ext-3.4.0/adapter/ext/ext-base.js"></script>
         <script src="http://extjs.cachefly.net/ext-3.4.0/ext-all-debug.js"></script>
         <script src="./script/OpenLayers.js"></script>
@@ -20,6 +21,7 @@
         <script type="text/javascript" src="./script/mootools-more-1.4.0.1.js"></script>
         <script type="text/javascript" src="./script/proj4.js"></script>
         <script type="text/javascript" src="./script/Progresiva.class.js"></script>
+        <script type="text/javascript" src="./script/Nomenclatura.class.js"></script>
         
         <script type="text/javascript" src="app900913.js"></script>
         <link rel="stylesheet" type="text/css" href="./theme/gxp/all.css"/>
@@ -44,6 +46,35 @@ body {
         <br>
         <span>Para calcular progresiva haga click sobre la ruta.</span>
         <div id="resultadoP"></div>
+    </div>
+</div>
+<div id="nomenclatura" class="x-hidden">
+    <div>
+        <label>Partido:</label>
+        <input id="partidoN" type="text" tipo="numero" largo="4"/>
+        <br>
+        <label>Circunscripción:</label>
+        <input id="circunscripcionN" type="text" tipo="texto" largo="2"/>
+        <br>
+        <label>Sección:</label>
+        <input id="seccionN" type="text" tipo="texto" largo="2"/>
+        <br>
+        <label>Chacra:</label>
+        <input id="chacraNN" type="text" tipo="numero" largo="4"/><input id="chacraTN" type="text" tipo="texto" largo="3"/>
+        <br>
+        <label>Quinta:</label>
+        <input id="quintaNN" type="text" tipo="numero" largo="4"/><input id="quintaTN" type="text" tipo="texto" largo="3"/>
+        <br>
+        <label>Fracción:</label>
+        <input id="fraccionNN" type="text" tipo="numero" largo="4"/><input id="fraccionTN" type="text" tipo="texto" largo="3"/>
+        <br>
+        <label>Manzana:</label>
+        <input id="manzanaNN" type="text" tipo="numero" largo="4"/><input id="manzanaTN" type="text" tipo="texto" largo="3"/>
+        <br>
+        <label>Parcela:</label>
+        <input id="parcelaNN" type="text" tipo="numero" largo="4"/><input id="parcelaTN" type="text" tipo="texto" largo="3"/>
+        <br>
+        <button>Buscar</button>
     </div>
 </div>
 

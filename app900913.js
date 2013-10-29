@@ -1,4 +1,4 @@
-var app, progresiva;
+var app, progresiva, nomenclatura;
 Ext.onReady(function() {
     GeoExt.Lang.set("es");
     app = new gxp.Viewer({
@@ -139,6 +139,16 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
                     progresiva.mostrar();
                 }
             }]
+        },{
+            // not a useful tool - just a demo for additional items
+            xtype: "tbbutton",
+            actionTarget: "map.tbar",
+            actions: [{
+                text: 'Nomenclatura',
+                handler: function() {
+                    nomenclatura.mostrar();
+                }
+            }]
         }],
         
         // layer sources
@@ -240,7 +250,7 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
             title: "Catalogo IDERA"
         },
         local: {
-            url: "http://25.9.84.47:8080/geoserver/Vialidad/wfs",
+            url: server+'geoserver/'+workspace+'/wfs',
                 //url: "http://ide.se.gov.ar/geonetwork/srv/en/csw",
             ptype: "gxp_wmscsource",
             title: "Local"  
@@ -288,4 +298,5 @@ html:'<br><b>Visualizador de IDERA</b><p>Este visualizador fue desarrollado por 
         }
     });
     progresiva = new Progresiva(this);
+    nomenclatura = new Nomenclatura(this);
 });
