@@ -1,4 +1,4 @@
-var server = "http://127.0.0.1:8080/";//"http://25.9.84.47:8080/";//http://hyperdvba:8080/";
+var server = "http://25.9.84.47:8080/";//"http://127.0.0.1:8080/";//http://hyperdvba:8080/";
 var masizos = "masizos",
 	parcelas = "parcelas";//"primaria";
 var workspace = "Vialidad";//"dvba";
@@ -29,11 +29,11 @@ var Nomenclatura = new Class({
 				contentEl	: this.dom,
 				autoScroll	: true,
 				onHide: function(){
-					self.clickControl.deactivate();
+					//self.clickControl.deactivate();
 					app.mapPanel.map.removeLayer(self.capa);
 				},
 				onShow: function(){
-					self.clickControl.activate();
+					//self.clickControl.activate();
 					app.mapPanel.map.addLayer(self.capa);
 				}
 			});
@@ -67,15 +67,13 @@ var Nomenclatura = new Class({
             }, 
 
             trigger: function(e) {
-            	var resultadoDom = self.dom.getElement('#resultadoP')
-				resultadoDom.empty();
                 var lonlat = app.mapPanel.map.getLonLatFromPixel(e.xy);
                 var point = new OpenLayers.Geometry.Point(lonlat.lon,lonlat.lat);
                 if(self.bufferVec){
 					self.capa.removeFeatures([self.bufferVec]);
 					self.bufferVec = false;
                 }
-                var bufferValue = 50;
+                var bufferValue = 5;
                 self.buffer = new OpenLayers.Geometry.Polygon.createRegularPolygon(point,bufferValue,20);
 				
 				self.bufferVec = new OpenLayers.Feature.Vector(self.buffer);
@@ -89,7 +87,7 @@ var Nomenclatura = new Class({
 						service: 'WFS',
 						version: '1.0.0',
 						request: 'GetFeature',
-						typeName: capa,
+						typeName: 'parcela',
 						maxFeatures: '100',
 						srsName: app.mapPanel.map.getProjection(),
 						outputFormat: 'text/javascript',
@@ -116,7 +114,7 @@ var Nomenclatura = new Class({
 			seteado: true
 		};
 		if(dom.getAttribute('tipo') == "numero"){
-			if(dom.value.toInt() == 0){
+			if(dom.value.toInt() == 0 || isNaN(dom.value.toInt())){
 				respuesta.seteado = false;
 			}
 		}else{
@@ -136,7 +134,7 @@ var Nomenclatura = new Class({
 			var valor = this._gTex(ids[i]);
 			if(valor.seteado)
 				respuesta.seteado = true;
-			respuesta.valor += valor.valor;
+			respuesta.valor = valor.valor + respuesta.valor;
 		};
 		return respuesta;
 	},
@@ -202,7 +200,6 @@ var Nomenclatura = new Class({
 			return false;
 		}
 		console.log(capa,this.nomenclatura);
-		return;
 		this.win.disable();
 		var myJSONP = new Request.JSONP({
 			url: server+'geoserver/'+workspace+'/wfs',
@@ -215,96 +212,41 @@ var Nomenclatura = new Class({
 				srsName: app.mapPanel.map.getProjection(),
 				outputFormat: 'text/javascript',
 				format_options: 'callback:callbackNomenclatura',
-				filter: '<And>  <PropertyIsEqualTo>    <PropertyName>nomencla</PropertyName>    <Literal>'+this.nomenclatura+'</Literal>  </PropertyIsEqualTo>  <PropertyIsGreaterThanOrEqualTo>   <PropertyName>PK_FINAL</PropertyName>   <Literal>'+this.kilometro+'</Literal>  </PropertyIsGreaterThanOrEqualTo>  <PropertyIsLessThanOrEqualTo>   <PropertyName>PK_INIC</PropertyName>   <Literal>'+this.kilometro+'</Literal>  </PropertyIsLessThanOrEqualTo> </And>'
+				filter: '<PropertyIsEqualTo> <PropertyName>NOMENCLA</PropertyName> <Literal>'+this.nomenclatura+'</Literal> </PropertyIsEqualTo>'
 			},
 		}).send();
+	},
+	parseNomencla: function(a){
+		var valores = ['#partidoN','#circunscripcionN','#seccionN','#chacraNN','#chacraTN','#quintaNN','#quintaTN','#fraccionNN','#fraccionTN','#manzanaNN','#manzanaTN','#parcelaNN','#parcelaTN'],
+			i = 0;
+		while (a.length > 0){
+			var dom = this.dom.getElement(valores[i]);
+			var largo = dom.getAttribute('largo').toInt();
+			dom.value = a.substr(0,largo);
+			a = a.substring(largo);
+			i++;
+		}
 	},
 	procesarRespuesta: function(response){
 		var respuesta = response;
 		var self = this;
 		console.log('Respuesta',respuesta);
-		var resultadoDom = this.dom.getElement('#resultadoP')
-		resultadoDom.empty();
 		if(respuesta.features.length == 0){
-			Ext.MessageBox.alert('Error', 'No se pudo encontrar la progresiva, los datos son erroneos.');
+			Ext.MessageBox.alert('Error', 'No se pudo encontrar un resultado, los datos son erroneos.');
 		}else{
 			respuesta.features.each(function(item){
 				var feature = item;
-				// var mapa = [];
-				// for(i in feature.properties){
-				// 	if(typeof feature.properties[i] == 'function')
-				// 		continue;
-				// 	mapa.push([i,feature.properties[i]]);
-				// }
-				// var resultado = new HtmlTable({
-				// 	properties: {
-				// 		border: 1,
-				// 		cellspacing: 0
-				// 	},
-				// 	headers: ['Propiedad', 'Valor'],
-				// 	rows: mapa,
-				// 	zebra: true
-				// });
 				var punto,
 					lineString = [];
-				for (i in feature.geometry.coordinates[0]){
-					punto = feature.geometry.coordinates[0][i];
+				for (i in feature.geometry.coordinates[0][0]){
+					punto = feature.geometry.coordinates[0][0][i];
 					if(typeof punto == 'function') continue;
 					punto = new OpenLayers.Geometry.Point(punto[0],punto[1]);
 					lineString.push(punto);
 				}
 
-				var geometria = new OpenLayers.Geometry.LineString(lineString);
+				var geometria = new OpenLayers.Geometry.Polygon([new OpenLayers.Geometry.LinearRing(lineString)]);
 
-				//Calculo la el punto de la progresiva dentro del tramo
-				//PK_INIC,PK_FINAL
-				//console.log(feature.properties.PK_INIC, feature.properties.PK_FINAL, ' = ', feature.properties.PK_FINAL - feature.properties.PK_INIC);
-				var porcentaje = ((parseFloat(self.kilometro)-feature.properties.PK_INIC))/(feature.properties.PK_FINAL-feature.properties.PK_INIC);
-				console.log(porcentaje);
-				var vertices = geometria.getVertices();
-				var suma = 0;
-				vertices.each(function(point,i){
-					if(i==vertices.length-1) return;
-					//console.log(point.distanceTo(vertices[i+1]));
-					if(self.buffer){
-						var partecita = new OpenLayers.Geometry.LineString([vertices[i],vertices[i+1]]);
-						if(self.buffer.intersects(partecita)){
-							sumaBuffer = suma + point.distanceTo(self.buffer.getCentroid());
-						}
-					}
-					suma += point.distanceTo(vertices[i+1]);
-				})
-				if(self.buffer){
-					self.buffer = false;
-					var porcentaje = ((sumaBuffer / suma)>1)?1:(sumaBuffer / suma);
-					self.dom.getElement('#kilomentroP').value = Math.round((feature.properties.PK_INIC + (feature.properties.PK_FINAL - feature.properties.PK_INIC) * porcentaje)*1000)/1000;
-					self.dom.getElement('#rutaP').value = feature.properties.RUTA;
-				}
-				
-				var porcentajeEnSuma = suma * porcentaje;
-				
-				var listo = false;
-				vertices.each(function(point,i){
-					if(listo) return;
-					if(i==vertices.length-1) return;
-					//console.log(point.distanceTo(vertices[i+1]));
-					if(porcentajeEnSuma - point.distanceTo(vertices[i+1]) < 0){
-						listo = true;
-						var porcentajeTramo = porcentajeEnSuma/point.distanceTo(vertices[i+1]);
-						var distanciaProximo = point.distanceTo(vertices[i+1],{details:true});
-						if(self.puntoFeature){
-							self.capa.removeFeatures([self.puntoFeature]);
-							self.puntoFeature = false;
-		                }
-						self.puntoConsulta = point.clone();
-						self.puntoConsulta.x = distanciaProximo.x0+(distanciaProximo.x1-distanciaProximo.x0)*porcentajeTramo;
-						self.puntoConsulta.y = distanciaProximo.y0+(distanciaProximo.y1-distanciaProximo.y0)*porcentajeTramo;
-						self.puntoFeature = new OpenLayers.Feature.Vector(self.puntoConsulta);
-						self.capa.addFeatures([self.puntoFeature]);
-					}else{
-						porcentajeEnSuma -= point.distanceTo(vertices[i+1]);
-					}
-				})
 
 				if(self.vectorFeature){
 					self.capa.removeFeatures([self.vectorFeature]);
@@ -312,17 +254,9 @@ var Nomenclatura = new Class({
                 }
 				self.vectorFeature = new OpenLayers.Feature.Vector(geometria);
 				self.capa.addFeatures([self.vectorFeature]);
+				self.parseNomencla(feature.properties.NOMENCLA);
 				self.win.enable();
-				app.mapPanel.map.setCenter([self.puntoConsulta.x,self.puntoConsulta.y],15);
-				// var boton = new Element('button',{
-				// 	text: 'Ver en mapa'
-				// });
-				// boton.addEvent('click',function(){
-				// 	app.mapPanel.map.zoomToExtent(geometria.getBounds());
-				// })
-				
-				// boton.inject(resultadoDom);
-				// resultado.inject(resultadoDom);
+				app.mapPanel.map.zoomToExtent(geometria.getBounds());
 			})
 		}
 	}
